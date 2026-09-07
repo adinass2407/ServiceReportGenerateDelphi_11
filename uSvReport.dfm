@@ -4,16 +4,16 @@ object svReport: TsvReport
   AfterUninstall = ServiceAfterUninstall
   OnExecute = ServiceExecute
   OnStart = ServiceStart
-  Height = 750
-  Width = 1000
-  PixelsPerInch = 120
+  Height = 900
+  Width = 1200
+  PixelsPerInch = 144
   object con1: TMyConnection
     Database = 'sevenths_web_manage2'
     Port = 3838
     Username = 'Fatra'
     Server = 'abdi-svr02.ddns.net'
-    Left = 16
-    Top = 16
+    Left = 19
+    Top = 19
     EncryptedPassword = 'C8FFCCFF99FF9EFF91FF98FF99FF9EFF91FF98FF'
   end
   object qReportWeb: TwwMyQuery
@@ -35,8 +35,8 @@ object svReport: TsvReport
       '&KONDISI'
       'ORDER BY RAND()'
       'LIMIT 50')
-    Left = 80
-    Top = 16
+    Left = 96
+    Top = 19
     MacroData = <
       item
         Name = 'KONDISI'
@@ -119,8 +119,8 @@ object svReport: TsvReport
       ')parameter'
       'WHERE WHERE_COLUMN <> '#39#39)
     AfterScroll = qErpDetailAfterScroll
-    Left = 160
-    Top = 16
+    Left = 192
+    Top = 19
     object qErpDetailERP_DETAIL_ID: TStringField
       FieldName = 'ERP_DETAIL_ID'
       FixedChar = True
@@ -139,8 +139,8 @@ object svReport: TsvReport
   end
   object Query2: TwwMyQuery
     Connection = con1
-    Left = 232
-    Top = 16
+    Left = 278
+    Top = 19
   end
   object qDB: TwwMyQuery
     Connection = con1
@@ -150,8 +150,8 @@ object svReport: TsvReport
         'WHERE schema_name <> '#39'information_schema'#39' AND  schema_name <> '#39'm' +
         'ysql'#39' and schema_name <> '#39'performance_schema'#39
       '&KONDISI')
-    Left = 304
-    Top = 16
+    Left = 365
+    Top = 19
     MacroData = <
       item
         Name = 'KONDISI'
@@ -170,8 +170,8 @@ object svReport: TsvReport
       'WHERE GENERATE_FLAG = 0 AND IFNULL(ERROR,'#39#39') = '#39#39
       '&KONDISI'
       'LIMIT 50')
-    Left = 368
-    Top = 16
+    Left = 442
+    Top = 19
     MacroData = <
       item
         Name = 'KONDISI'
@@ -246,26 +246,26 @@ object svReport: TsvReport
   object db1: TMyConnection
     Username = 'Fatra'
     AfterConnect = db1AfterConnect
-    Left = 16
-    Top = 104
+    Left = 19
+    Top = 125
     EncryptedPassword = 'C8FFCCFF99FF9EFF91FF98FF99FF9EFF91FF98FF'
   end
   object Query1: TwwMyQuery
     Connection = db1
-    Left = 72
-    Top = 104
+    Left = 86
+    Top = 125
   end
   object sql1: TMyScript
     Debug = True
     OnError = sql1Error
     Connection = db1
-    Left = 136
-    Top = 104
+    Left = 163
+    Top = 125
   end
   object wwMyQuery1: TwwMyQuery
     Connection = db1
-    Left = 896
-    Top = 96
+    Left = 1075
+    Top = 115
   end
   object qClient: TwwMyQuery
     Connection = db1
@@ -279,8 +279,8 @@ object svReport: TsvReport
       'ORDER BY'
       '  &Order'
       '')
-    Left = 304
-    Top = 104
+    Left = 365
+    Top = 125
     MacroData = <
       item
         Name = 'select'
@@ -302,8 +302,8 @@ object svReport: TsvReport
       'FROM'
       '  &KONDISI'
       'order by a.DOCUMENT_NO')
-    Left = 368
-    Top = 104
+    Left = 442
+    Top = 125
     MacroData = <
       item
         Name = 'KONDISI'
@@ -315,8 +315,8 @@ object svReport: TsvReport
       'SELECT * '
       'FROM ERP_USER'
       'WHERE ERP_USER_ID=:ERP_USER_ID')
-    Left = 536
-    Top = 48
+    Left = 643
+    Top = 58
     ParamData = <
       item
         DataType = ftUnknown
@@ -326,278 +326,278 @@ object svReport: TsvReport
   end
   object qERP_SQL: TwwMyQuery
     Connection = db1
-    Left = 608
-    Top = 48
+    Left = 730
+    Top = 58
   end
   object q1: TwwMyQuery
     Connection = db1
-    Left = 16
-    Top = 192
+    Left = 19
+    Top = 230
   end
   object ds1: TwwDataSource
     DataSet = q1
-    Left = 16
-    Top = 256
+    Left = 19
+    Top = 307
   end
   object q2: TwwMyQuery
     Connection = db1
-    Left = 58
-    Top = 192
+    Left = 70
+    Top = 230
   end
   object ds2: TwwDataSource
     DataSet = q2
-    Left = 58
-    Top = 256
+    Left = 70
+    Top = 307
   end
   object q3: TwwMyQuery
     Connection = db1
-    Left = 98
-    Top = 192
+    Left = 118
+    Top = 230
   end
   object ds3: TwwDataSource
     DataSet = q3
-    Left = 98
-    Top = 256
+    Left = 118
+    Top = 307
   end
   object q4: TwwMyQuery
     Connection = db1
-    Left = 138
-    Top = 192
+    Left = 166
+    Top = 230
   end
   object ds4: TwwDataSource
     DataSet = q4
-    Left = 138
-    Top = 256
+    Left = 166
+    Top = 307
   end
   object q5: TwwMyQuery
     Connection = db1
-    Left = 178
-    Top = 192
+    Left = 214
+    Top = 230
   end
   object ds5: TwwDataSource
     DataSet = q5
-    Left = 178
-    Top = 256
+    Left = 214
+    Top = 307
   end
   object q6: TwwMyQuery
     Connection = db1
-    Left = 218
-    Top = 192
+    Left = 262
+    Top = 230
   end
   object ds6: TwwDataSource
     DataSet = q6
-    Left = 218
-    Top = 256
+    Left = 262
+    Top = 307
   end
   object q7: TwwMyQuery
     Connection = db1
-    Left = 258
-    Top = 192
+    Left = 310
+    Top = 230
   end
   object ds7: TwwDataSource
     DataSet = q7
-    Left = 258
-    Top = 256
+    Left = 310
+    Top = 307
   end
   object q8: TwwMyQuery
     Connection = db1
-    Left = 298
-    Top = 192
+    Left = 358
+    Top = 230
   end
   object ds8: TwwDataSource
     DataSet = q8
-    Left = 298
-    Top = 256
+    Left = 358
+    Top = 307
   end
   object q9: TwwMyQuery
     Connection = db1
-    Left = 338
-    Top = 192
+    Left = 406
+    Top = 230
   end
   object ds9: TwwDataSource
     DataSet = q9
-    Left = 338
-    Top = 256
+    Left = 406
+    Top = 307
   end
   object q10: TwwMyQuery
     Connection = db1
-    Left = 386
-    Top = 192
+    Left = 463
+    Top = 230
   end
   object ds10: TwwDataSource
     DataSet = q10
-    Left = 386
-    Top = 256
+    Left = 463
+    Top = 307
   end
   object q11: TwwMyQuery
     Connection = db1
-    Left = 16
-    Top = 328
+    Left = 19
+    Top = 394
   end
   object ds11: TwwDataSource
     DataSet = q11
-    Left = 16
-    Top = 392
+    Left = 19
+    Top = 470
   end
   object q12: TwwMyQuery
     Connection = db1
-    Left = 58
-    Top = 328
+    Left = 70
+    Top = 394
   end
   object ds12: TwwDataSource
     DataSet = q12
-    Left = 58
-    Top = 392
+    Left = 70
+    Top = 470
   end
   object q13: TwwMyQuery
     Connection = db1
-    Left = 98
-    Top = 328
+    Left = 118
+    Top = 394
   end
   object ds13: TwwDataSource
     DataSet = q13
-    Left = 98
-    Top = 392
+    Left = 118
+    Top = 470
   end
   object q14: TwwMyQuery
     Connection = db1
-    Left = 138
-    Top = 328
+    Left = 166
+    Top = 394
   end
   object ds14: TwwDataSource
     DataSet = q14
-    Left = 138
-    Top = 392
+    Left = 166
+    Top = 470
   end
   object q15: TwwMyQuery
     Connection = db1
-    Left = 178
-    Top = 328
+    Left = 214
+    Top = 394
   end
   object ds15: TwwDataSource
     DataSet = q15
-    Left = 178
-    Top = 392
+    Left = 214
+    Top = 470
   end
   object q16: TwwMyQuery
     Connection = db1
-    Left = 218
-    Top = 328
+    Left = 262
+    Top = 394
   end
   object ds16: TwwDataSource
     DataSet = q16
-    Left = 218
-    Top = 392
+    Left = 262
+    Top = 470
   end
   object q17: TwwMyQuery
     Connection = db1
-    Left = 258
-    Top = 328
+    Left = 310
+    Top = 394
   end
   object ds17: TwwDataSource
     DataSet = q17
-    Left = 258
-    Top = 392
+    Left = 310
+    Top = 470
   end
   object q18: TwwMyQuery
     Connection = db1
-    Left = 298
-    Top = 328
+    Left = 358
+    Top = 394
   end
   object ds18: TwwDataSource
     DataSet = q18
-    Left = 298
-    Top = 392
+    Left = 358
+    Top = 470
   end
   object q19: TwwMyQuery
     Connection = db1
-    Left = 338
-    Top = 328
+    Left = 406
+    Top = 394
   end
   object ds19: TwwDataSource
     DataSet = q19
-    Left = 338
-    Top = 392
+    Left = 406
+    Top = 470
   end
   object q20: TwwMyQuery
     Connection = db1
-    Left = 386
-    Top = 328
+    Left = 463
+    Top = 394
   end
   object ds20: TwwDataSource
     DataSet = q20
-    Left = 386
-    Top = 392
+    Left = 463
+    Top = 470
   end
   object qHeader: TwwMyQuery
     Connection = db1
-    Left = 530
-    Top = 120
+    Left = 636
+    Top = 144
   end
   object dsHeader: TwwDataSource
     DataSet = qHeader
-    Left = 530
-    Top = 184
+    Left = 636
+    Top = 221
   end
   object qDetail: TwwMyQuery
     Connection = db1
-    Left = 570
-    Top = 120
+    Left = 684
+    Top = 144
   end
   object dsDetail: TwwDataSource
     DataSet = qDetail
-    Left = 570
-    Top = 184
+    Left = 684
+    Top = 221
   end
   object qDetail1: TwwMyQuery
     Connection = db1
-    Left = 610
-    Top = 120
+    Left = 732
+    Top = 144
   end
   object dsDetail1: TwwDataSource
     DataSet = qDetail1
-    Left = 610
-    Top = 184
+    Left = 732
+    Top = 221
   end
   object qDetail2: TwwMyQuery
     Connection = db1
-    Left = 650
-    Top = 120
+    Left = 780
+    Top = 144
   end
   object dsDetail2: TwwDataSource
     DataSet = qDetail2
-    Left = 650
-    Top = 184
+    Left = 780
+    Top = 221
   end
   object qDetail3: TwwMyQuery
     Connection = db1
-    Left = 698
-    Top = 120
+    Left = 838
+    Top = 144
   end
   object dsDetail3: TwwDataSource
     DataSet = qDetail3
-    Left = 698
-    Top = 184
+    Left = 838
+    Top = 221
   end
   object qDetail4: TwwMyQuery
     Connection = db1
-    Left = 746
-    Top = 120
+    Left = 895
+    Top = 144
   end
   object dsDetail4: TwwDataSource
     DataSet = qDetail4
-    Left = 746
-    Top = 184
+    Left = 895
+    Top = 221
   end
   object qNo_Form: TwwMyQuery
     Connection = db1
-    Left = 530
-    Top = 256
+    Left = 636
+    Top = 307
   end
   object dsNo_Form: TwwDataSource
     DataSet = qNo_Form
-    Left = 530
-    Top = 320
+    Left = 636
+    Top = 384
   end
   object qSql: TwwMyQuery
     Connection = db1
@@ -610,8 +610,8 @@ object svReport: TsvReport
       '  a.ERP_RPT_ID = :ERP_RPT_ID'
       'ORDER BY'
       '  b.no_urut')
-    Left = 570
-    Top = 256
+    Left = 684
+    Top = 307
     ParamData = <
       item
         DataType = ftUnknown
@@ -621,18 +621,18 @@ object svReport: TsvReport
   end
   object dsSql: TwwDataSource
     DataSet = qSql
-    Left = 570
-    Top = 320
+    Left = 684
+    Top = 384
   end
   object qGroup: TwwMyQuery
     Connection = db1
-    Left = 610
-    Top = 256
+    Left = 732
+    Top = 307
   end
   object dsGroup: TwwDataSource
     DataSet = qGroup
-    Left = 610
-    Top = 320
+    Left = 732
+    Top = 384
   end
   object qErp_rpt_sql_name: TwwMyQuery
     Connection = db1
@@ -641,8 +641,8 @@ object svReport: TsvReport
       '* FROM erp_rpt_sql_name'
       'WHERE SQL_NAME <> '#39'Tidak Ada'#39
       'ORDER BY SEQ')
-    Left = 520
-    Top = 400
+    Left = 624
+    Top = 480
   end
   object qSetup: TwwMyQuery
     Connection = db1
@@ -652,8 +652,8 @@ object svReport: TsvReport
       '  setup a'
       'left join Address b on a.address_id=b.address_id'
       '  ')
-    Left = 24
-    Top = 480
+    Left = 29
+    Top = 576
   end
   object QListEditor: TwwMyQuery
     Connection = db1
@@ -671,8 +671,8 @@ object svReport: TsvReport
       'WHERE TRUE'
       'AND a.ERP_RPT_ID = :ERP_RPT_ID'
       'ORDER BY URUT')
-    Left = 96
-    Top = 480
+    Left = 115
+    Top = 576
     ParamData = <
       item
         DataType = ftUnknown
@@ -697,8 +697,8 @@ object svReport: TsvReport
       'FROM'
       '  period A'
       '&Kondisi')
-    Left = 168
-    Top = 480
+    Left = 202
+    Top = 576
     MacroData = <
       item
         Name = 'Kondisi'
@@ -762,8 +762,8 @@ object svReport: TsvReport
       '&kondisiUser'
       'GROUP BY A.COA_ID '
       'order by b.PRIMARY_FLAG desc,COA_CODE')
-    Left = 24
-    Top = 552
+    Left = 29
+    Top = 662
     MacroData = <
       item
         Name = 'kondisi'
@@ -795,8 +795,8 @@ object svReport: TsvReport
       'ORDER BY'
       '  IFNULL(g.PRIMARY_FLAG,a.PRIMARY_FLAG) DESC,'
       '  a.WAREHOUSE_NAME')
-    Left = 96
-    Top = 551
+    Left = 115
+    Top = 661
     ParamData = <
       item
         DataType = ftUnknown
@@ -848,8 +848,8 @@ object svReport: TsvReport
       'ORDER BY'
       ''
       'K.FIRST_NAME')
-    Left = 168
-    Top = 551
+    Left = 202
+    Top = 661
     ParamData = <
       item
         DataType = ftUnknown
@@ -895,8 +895,8 @@ object svReport: TsvReport
       'GROUP BY b.ERP_LOOKUP_VALUE_ID'
       ''
       'ORDER BY b.Primary_Flag DESC,b.DISPLAY_NAME')
-    Left = 24
-    Top = 624
+    Left = 29
+    Top = 749
     ParamData = <
       item
         DataType = ftUnknown
@@ -921,8 +921,8 @@ object svReport: TsvReport
       'WHERE  (COA_ID = :COA_ID) AND '
       '       (PERIOD_NAME = :PERIOD_NAME)'
       '')
-    Left = 96
-    Top = 624
+    Left = 115
+    Top = 749
     ParamData = <
       item
         DataType = ftUnknown
@@ -973,8 +973,8 @@ object svReport: TsvReport
       'GROUP BY b.ERP_LOOKUP_VALUE_ID'
       ''
       'ORDER BY b.Primary_Flag DESC,b.DISPLAY_NAME')
-    Left = 248
-    Top = 551
+    Left = 298
+    Top = 661
     ParamData = <
       item
         DataType = ftUnknown
@@ -991,8 +991,8 @@ object svReport: TsvReport
   end
   object qQry: TwwMyQuery
     Connection = db1
-    Left = 248
-    Top = 480
+    Left = 298
+    Top = 576
   end
   object IdSSLIOHandlerSocket: TIdSSLIOHandlerSocketOpenSSL
     Destination = 'abdi-svr01.ddns.net:21'
@@ -1006,8 +1006,8 @@ object svReport: TsvReport
     SSLOptions.Mode = sslmClient
     SSLOptions.VerifyMode = []
     SSLOptions.VerifyDepth = 0
-    Left = 313
-    Top = 556
+    Left = 376
+    Top = 667
   end
   object IdFTP: TIdFTP
     IOHandler = IdSSLIOHandlerSocket
@@ -1020,8 +1020,8 @@ object svReport: TsvReport
     NATKeepAlive.IntervalMS = 0
     ProxySettings.ProxyType = fpcmNone
     ProxySettings.Port = 0
-    Left = 311
-    Top = 482
+    Left = 373
+    Top = 578
   end
   object RESTClient1: TRESTClient
     Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
@@ -1029,8 +1029,8 @@ object svReport: TsvReport
     BaseURL = 'https://api.seventhsoft.id/api/send-notification'
     Params = <>
     SynchronizedEvents = False
-    Left = 520
-    Top = 480
+    Left = 624
+    Top = 576
   end
   object RESTRequest1: TRESTRequest
     AssignedValues = [rvConnectTimeout, rvReadTimeout]
@@ -1043,12 +1043,12 @@ object svReport: TsvReport
       end>
     Response = RESTResponse1
     SynchronizedEvents = False
-    Left = 720
-    Top = 480
+    Left = 864
+    Top = 576
   end
   object RESTResponse1: TRESTResponse
     ContentType = 'application/json'
-    Left = 616
-    Top = 480
+    Left = 739
+    Top = 576
   end
 end

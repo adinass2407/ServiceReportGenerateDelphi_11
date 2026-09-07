@@ -178,8 +178,8 @@ type
     oldNilai_TGL1, oldNilai_TGL2: tdatetime;
     patch, vErr: string;
     dbase: array[0..4] of string;
-    vOutPutFile, vFtpFlag: string;   // <-- baru
-    vFtpBol: Boolean;                 // <-- baru
+    vOutPutFile, vFtpFlag, vPDFFlag: string;   // <-- baru
+    vFtpBol, vPDFBol: Boolean;                 // <-- baru
     N, panjang_posisi: Integer;
 
     NOT_REPORT_all_flag, NOT_SALES_all_flag, NOT_GUDANG_all_flag, NOT_BANK_all_flag, NOT_DIVISI_all_flag, NOT_MEREK_all_flag: Boolean;
@@ -811,8 +811,10 @@ begin
         else if i = 5 then
           vOutPutFile := Txt
         else if i = 6 then
+          vFtpFlag := Txt
+        else if i = 7 then
         begin
-          vFtpFlag := Txt;
+          vPDFFlag := Txt;
           Break;
         end;
         i := i + 1;
@@ -840,6 +842,9 @@ begin
 
   if aFTP <> '' then
     vFTP := Base64Decode(aFTP);
+  vPDFBol := True;
+  if (vPDFFlag = '') or (vPDFFlag = 'N') then
+    vPDFBol := False;
   if vFTP = '' then
     vFTP := 'https://seventhsoft.net';
 
@@ -8338,7 +8343,13 @@ begin
         vFilePdf := ExtractFileName(StringReplace(Filename, '.xlsx', '', [rfReplaceAll, rfIgnoreCase]));
         vFilePdf := vReportFolder + vFilePdf + '.pdf';
 
-        ProcessExcelToPdf(Filename, vFilePdf);
+        if vPDFBol then
+        begin
+          ProcessExcelToPdf(Filename, vFilePdf);
+          Run_sql('SET @PDF_FLAG = TRUE');
+        end
+        else
+          Run_sql('SET @PDF_FLAG = FALSE');
         file_excel := Filename;
       end;
     except
