@@ -43,68 +43,87 @@ object svReport: TsvReport
       end>
     object qReportWebAPI_REPORT_ID: TIntegerField
       FieldName = 'API_REPORT_ID'
+      Origin = 'API_REPORT.API_REPORT_ID'
     end
     object qReportWebJSON: TMemoField
       FieldName = 'JSON'
+      Origin = 'API_REPORT.JSON'
       BlobType = ftMemo
     end
     object qReportWebSERVER_ID: TIntegerField
       FieldName = 'SERVER_ID'
+      Origin = 'API_REPORT.SERVER_ID'
     end
     object qReportWebERP_RPT_ID: TIntegerField
       FieldName = 'ERP_RPT_ID'
+      Origin = 'API_REPORT.ERP_RPT_ID'
     end
     object qReportWebGENERATE_FLAG: TIntegerField
       FieldName = 'GENERATE_FLAG'
+      Origin = 'API_REPORT.GENERATE_FLAG'
     end
     object qReportWebPDF_FLAG: TIntegerField
       FieldName = 'PDF_FLAG'
+      Origin = 'API_REPORT.PDF_FLAG'
     end
     object qReportWebREAD_FLAG: TBooleanField
       FieldName = 'READ_FLAG'
+      Origin = 'API_REPORT.READ_FLAG'
     end
     object qReportWebNOTIF_FLAG: TBooleanField
       FieldName = 'NOTIF_FLAG'
+      Origin = 'API_REPORT.NOTIF_FLAG'
     end
     object qReportWebERROR: TMemoField
       FieldName = 'ERROR'
+      Origin = 'API_REPORT.ERROR'
       BlobType = ftMemo
     end
     object qReportWebERROR_USER: TMemoField
       FieldName = 'ERROR_USER'
+      Origin = 'API_REPORT.ERROR_USER'
       BlobType = ftMemo
     end
     object qReportWebPATH_FILE: TStringField
       FieldName = 'PATH_FILE'
+      Origin = 'API_REPORT.PATH_FILE'
       Size = 500
     end
     object qReportWebOUTPUT_FILE: TStringField
       FieldName = 'OUTPUT_FILE'
+      Origin = 'API_REPORT.OUTPUT_FILE'
       Size = 500
     end
     object qReportWebCREATED_DATE: TDateTimeField
       FieldName = 'CREATED_DATE'
+      Origin = 'API_REPORT.CREATED_DATE'
     end
     object qReportWebLAST_UPDATED_DATE: TDateTimeField
       FieldName = 'LAST_UPDATED_DATE'
+      Origin = 'API_REPORT.LAST_UPDATED_DATE'
     end
     object qReportWebERP_USER_ID: TIntegerField
       FieldName = 'ERP_USER_ID'
+      Origin = 'API_REPORT.ERP_USER_ID'
     end
     object qReportWebHOSTNAME: TStringField
       FieldName = 'HOSTNAME'
+      Origin = 'API_REPORT.HOSTNAME'
       Size = 100
     end
     object qReportWebPORT: TStringField
       FieldName = 'PORT'
+      Origin = 'API_REPORT.PORT'
       Size = 50
     end
     object qReportWebDATABASE_NAME: TStringField
       FieldName = 'DATABASE_NAME'
+      Origin = 'API_REPORT.DATABASE_NAME'
       Size = 60
     end
     object qReportWebTEMPLATE_FILE: TStringField
       FieldName = 'TEMPLATE_FILE'
+      Origin = 'API_REPORT.TEMPLATE_FILE'
       Size = 100
     end
   end
@@ -118,6 +137,7 @@ object svReport: TsvReport
       #39#39' WHERE_VALUE'
       ')parameter'
       'WHERE WHERE_COLUMN <> '#39#39)
+    CachedUpdates = True
     AfterScroll = qErpDetailAfterScroll
     Left = 192
     Top = 19

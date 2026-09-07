@@ -198,6 +198,7 @@ type
     function LoginManage(vDB, vHostName, vPort: string): Boolean;
     function Run_query(vstr: string): Boolean;
     function keluar(): Boolean;
+    function pisahdelimeter(sumber, delimeter: string; var jumlah: integer): Tarrstring;
     function pertamakali(): Boolean;
     function createExcel(vReportId: string): Boolean;     //isi_sql
     function Define_Sql: Boolean;
@@ -1012,7 +1013,7 @@ begin
 
 end;
 
-function pisahdelimeter(sumber, delimeter: string; var jumlah: integer): Tarrstring;
+function TsvReport.pisahdelimeter(sumber, delimeter: string; var jumlah: integer): Tarrstring;
 var
   s: string;
   temp: tarrstring;
@@ -1023,22 +1024,29 @@ begin
   awal := 1;
   setlength(temp, 20);
   i := 0;
-  if sumber <> '' then
-    repeat
+  try
+    logFile('pisahdelimeter ' + sumber);
+    if sumber <> '' then
+      repeat
   //for I := 0 to length(sumber) do begin
-      s := sumber[i];
-      if (s = delimeter) or (i > length(sumber)) then
-      begin
-        temp[jumlah] := copy(sumber, awal, i - awal);
-        sumber := copy(sumber, i + 1, length(sumber) - i + 1);
-        inc(jumlah);
-        i := -1;
-      end;
-      inc(i);
+        s := sumber[i];
+        if (s = delimeter) or (i > length(sumber)) then
+        begin
+          temp[jumlah] := copy(sumber, awal, i - awal);
+          sumber := copy(sumber, i + 1, length(sumber) - i + 1);
+          inc(jumlah);
+          i := -1;
+        end;
+        inc(i);
   //end;
-    until (length(sumber) = 0);
+      until (length(sumber) = 0);
+    result := temp;
 
-  result := temp;
+  except
+    on E: Exception do
+      logFile(e.Message)
+  end;
+
 end;
 
 function TsvReport.pertamakali(): Boolean;
@@ -1077,6 +1085,16 @@ begin
   fillchar(punyabapak, sizeof(punyabapak), 0);
   fillchar(posisianak, sizeof(posisianak), 0);
   fillchar(posisibapak, sizeof(posisibapak), 0);
+
+// ====== TAMBAHAN BARU: reset array terkait oldNILAI, penyebab Range check error ======
+  fillchar(oldNILAI_nama_field, sizeof(oldNILAI_nama_field), 0);
+  fillchar(oldNILAI_satu, sizeof(oldNILAI_satu), 0);
+  fillchar(oldNILAI_satu_id, sizeof(oldNILAI_satu_id), 0);
+  fillchar(oldNILAI_dua, sizeof(oldNILAI_dua), 0);
+  fillchar(oldNILAI_dua_id, sizeof(oldNILAI_dua_id), 0);
+  fillchar(oldNILAI_ALL, sizeof(oldNILAI_ALL), 0);
+  panjang_posisi := 1;
+// ====== AKHIR TAMBAHAN ======
   logFile('selesai deklarasi');
 
   tgl_pertama := false;
@@ -1124,11 +1142,13 @@ begin
       tipeparam := qlistEditor.FIELDBYNAME('PARAM_TYPE').ASinteger;
         //sqlparam := pisahdelimeter(qlistEditor.FIELDBYNAME('SQL_USES').ASSTRING,'|',jum_sql);
       punyaanak[URUT] := qlistEditor.FIELDBYNAME('PARENT_FROM_ID').ASinteger;
-
       if punyaanak[URUT] <> 0 then
-        punyabapak[punyaanak[URUT]] := i
-      else
-        punyabapak[punyaanak[URUT]] := 0;
+      begin
+        if (punyaanak[URUT] >= 1) and (punyaanak[URUT] <= maxarrayparam) then
+          punyabapak[punyaanak[URUT]] := i
+        else
+          logFile('PARENT_FROM_ID tidak valid (' + IntToStr(punyaanak[URUT]) + ') untuk URUT=' + IntToStr(URUT) + ', dilewati assignment punyabapak');
+      end;
 
         { fatra feb 2021
          sengaja di buat 2 param semua dulu trus di hide
@@ -2604,7 +2624,13 @@ begin
         VAR_ARRAY := QListEditor.FieldByName('VAR_ARRAY').AsInteger;
 
         pilih_allitem := 0;
-        str[urut] := '';
+        logFile('str[urut] := ');
+        try
+          str[urut] := '';
+        except
+          on E: Exception do
+            logFile('str[urut] ' + E.Message)
+        end;
         if pilih_allitem = 0 then
         begin
           str_tambah := '';
@@ -2615,19 +2641,27 @@ begin
             posisi := 1;
           while true do
           begin
-            if oldNILAI_nama_field[posisi] = Query1.fieldbyname('display_form').AsString then
-              break
-            else
-            begin
-              if oldNILAI_nama_field[posisi] = '' then
-              begin
-                oldNILAI_nama_field[posisi] := Query1.FieldByName('display_form').AsString;
-                panjang_posisi := panjang_posisi + 1;
-              end
+            try
+              logFile('CHECK ERROR oldNILAI_nama_field ');
+              if oldNILAI_nama_field[posisi] = Query1.fieldbyname('display_form').AsString then
+                break
               else
               begin
-                posisi := posisi + 1;
+                if oldNILAI_nama_field[posisi] = '' then
+                begin
+                  oldNILAI_nama_field[posisi] := Query1.FieldByName('display_form').AsString;
+                  panjang_posisi := panjang_posisi + 1;
+                end
+                else
+                begin
+                  posisi := posisi + 1;
 
+                end;
+              end;
+            except
+              on E: Exception do
+              begin
+                logFile('ERROR oldNILAI_nama_field ' + E.Message)
               end;
             end;
           end;
@@ -2642,6 +2676,7 @@ begin
               //ini untuk menunjukkan apakah nama_id pada tabel sama dengan nama_id 'CHILD_VALUE' pada paramlookup1 di erp_RPT_PARAM
               //gunanya jika sama maka mengisi 'isi_nama_id' pada field yang dibawah group item
               //jika tidak sama maka mengisi 'isi_nama_id' dengan combo biasanya
+                logFile('isi_nama_id[urut]');
                 isi_nama_id[urut] := '';
                 logFile('proses field ' + nama_id[urut]);
                 if myNewQuery[urut].Active then
@@ -8316,7 +8351,12 @@ begin
 
       logFile(nama_template + '.xlsx'); // iksan
       logFile(Filename); // iksan
-      Repstart.Run(nama_template + '.xlsx', Filename);
+      try
+        Repstart.Run(nama_template + '.xlsx', Filename);
+      except
+        on E: Exception do
+          logFile('Repstart.Run ' + E.Message)
+      end;
       if FileExists(Filename) then
       begin
       // ===== Tentukan folder & nama file PDF tujuan (aman di main thread) =====
@@ -8689,10 +8729,11 @@ begin
             defa_template := patch + vDatabaseFolder + '\' + qsetup.fieldbyname('Template_folder').asstring + '\';
         end;
 
-        qErpDetail.Close;
-        qErpDetail.Open;
+        logFile('Reset qErpDetail');
         qErpDetail.Filtered := False;
         qErpDetail.Filter := '';
+        qErpDetail.Close;
+        qErpDetail.Open;
 
         // ====================================================================
         // BLOK PARSING JSON (System.JSON) - PENGGANTI TlkJSON
