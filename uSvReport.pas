@@ -282,7 +282,7 @@ const
   AliasGroup1 = 'Xgroup1';
   TDepartment_id = '&Department_id';
   AngkaNonAktif = 77;
-  maxarrayparam = 100;
+  maxarrayparam = 100000;
 
 var
   anu, anu2, anu3: string;
@@ -1016,37 +1016,42 @@ end;
 function TsvReport.pisahdelimeter(sumber, delimeter: string; var jumlah: integer): Tarrstring;
 var
   s: string;
-  temp: tarrstring;
+  temp: Tarrstring;
   i, awal: integer;
 begin
-  s := sumber;
   jumlah := 0;
-  awal := 1;
-  setlength(temp, 20);
-  i := 0;
+  setlength(temp, 0);
   try
     logFile('pisahdelimeter ' + sumber);
     if sumber <> '' then
-      repeat
-  //for I := 0 to length(sumber) do begin
-        s := sumber[i];
-        if (s = delimeter) or (i > length(sumber)) then
+    begin
+      awal := 1;
+      i := 1;                       // start at 1, not 0
+      while i <= length(sumber) + 1 do
+      begin
+        if (i > length(sumber)) or (copy(sumber, i, 1) = delimeter) then
         begin
+          setlength(temp, jumlah + 1);
           temp[jumlah] := copy(sumber, awal, i - awal);
-          sumber := copy(sumber, i + 1, length(sumber) - i + 1);
           inc(jumlah);
-          i := -1;
+          awal := i + 1;
         end;
         inc(i);
-  //end;
-      until (length(sumber) = 0);
+      end;
+    end;
+    logFile(string.join(',', temp));
     result := temp;
-
   except
     on E: Exception do
-      logFile(e.Message)
+    begin
+      logFile(e.Message);
+      setlength(temp, 1);
+      temp[0] := sumber;
+      Result := temp;
+      jumlah := 1;
+      logFile(string.join(',', temp));
+    end;
   end;
-
 end;
 
 function TsvReport.pertamakali(): Boolean;
@@ -1142,14 +1147,15 @@ begin
       tipeparam := qlistEditor.FIELDBYNAME('PARAM_TYPE').ASinteger;
         //sqlparam := pisahdelimeter(qlistEditor.FIELDBYNAME('SQL_USES').ASSTRING,'|',jum_sql);
       punyaanak[URUT] := qlistEditor.FIELDBYNAME('PARENT_FROM_ID').ASinteger;
-      if punyaanak[URUT] <> 0 then
-      begin
-        if (punyaanak[URUT] >= 1) and (punyaanak[URUT] <= maxarrayparam) then
-          punyabapak[punyaanak[URUT]] := i
+      try
+        if punyaanak[URUT] <> 0 then
+          punyabapak[punyaanak[URUT]] := qlistEditor.RecNo
         else
-          logFile('PARENT_FROM_ID tidak valid (' + IntToStr(punyaanak[URUT]) + ') untuk URUT=' + IntToStr(URUT) + ', dilewati assignment punyabapak');
+          punyabapak[punyaanak[URUT]] := 0;
+      except
+        on E: Exception do
+          logFile('punyaanak[URUT]' + e.Message)
       end;
-
         { fatra feb 2021
          sengaja di buat 2 param semua dulu trus di hide
          krn lap hpp = 2 param di periode tapi keluar cuma 1 periode akhir nya error
@@ -1203,6 +1209,7 @@ begin
           myNewQuery[URUT].MacroByName('limit').Value := ' limit 1';
           try
             myNewQuery[URUT].Open;
+            logFile('query ' + myNewQuery[URUT].Name + ' : ' + myNewQuery[URUT].FinalSQL);
           except
             vOpenPertama := True;
           end;
@@ -1212,6 +1219,7 @@ begin
           myNewQuery[URUT].SQL.Add(' LIMIT 1');
           try
             myNewQuery[URUT].Open;
+            logFile('query ' + myNewQuery[URUT].Name + ' : ' + myNewQuery[URUT].FinalSQL);
           except
             vOpenPertama := True;
           end;
@@ -1284,8 +1292,9 @@ begin
         end;
         logFile('Proses 7');
 
-        namaparam1 := pisahdelimeter(qlistEditor.FIELDBYNAME('COMBO_TITLES').ASSTRING, '|', jum_param1);
-        isinamaparam1[URUT] := pisahdelimeter(qlistEditor.FIELDBYNAME('COMBO_FIELDS').ASSTRING, '|', jum_param1);
+        namaparam1 := pisahdelimeter(qlistEditor.fieldbyname('COMBO_TITLES').ASSTRING, '|', jum_param1);
+        isinamaparam1[URUT] := pisahdelimeter(qlistEditor.fieldbyname('COMBO_FIELDS').ASSTRING, '|', jum_param1);
+        panjangnamaparam1 := pisahdelimeter(qlistEditor.fieldbyname('COMBO_WIDTHS').ASSTRING, '|', jum_param1);
 
 
          {if (tipeparam <> 1) AND (
@@ -1325,12 +1334,14 @@ begin
           logFile('WHERE_VALUE ' + qErpDetailWHERE_VALUE.AsString + ' WHERE_COLUMN ' + qErpDetailWHERE_COLUMN.AsString);
           if (qErpDetailWHERE_VALUE.AsString <> '') and (qErpDetailWHERE_COLUMN.AsString <> '') then
           begin
-            vFieldName := qErpDetailWHERE_COLUMN.AsString;
+            vFieldName := isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]];
             if (vFieldName <> '') and not vOpenPertama then
             begin
               if myNewQuery[URUT].FindField(vFieldName) <> nil then
               begin
-                if myNewQuery[URUT].FieldByName(vFieldName).Origin <> '' then
+                if isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]] <> '' then
+                  vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]]
+                else if myNewQuery[URUT].FieldByName(vFieldName).Origin <> '' then
                   vFieldName := myNewQuery[URUT].FieldByName(vFieldName).Origin
               end
               else
@@ -1348,10 +1359,14 @@ begin
                 myNewQuery[URUT].MacroByName('KONDISI').Value := ' AND ' + vFieldName + ' = ' + QuotedStr(qErpDetailWHERE_VALUE.AsString);
                 try
                   myNewQuery[URUT].Active := true;
+                  logFile('query ' + myNewQuery[URUT].Name + ' : ' + myNewQuery[URUT].FinalSQL);
                 except
-                  logFile('maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !');
-                  vError := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
-                  Exit;
+                  on E: Exception do
+                  begin
+                    logFile('maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi ! ' + sLineBreak + E.Message + sLineBreak + 'query :' + myNewQuery[URUT].FinalSQL);
+                    vError := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
+                    Exit;
+                  end;
                 end;
               end
               else
@@ -1363,11 +1378,6 @@ begin
             end;
           end;
         end;
-
-        logFile('Proses 9');
-        namaparam1 := pisahdelimeter(qlistEditor.fieldbyname('COMBO_TITLES').ASSTRING, '|', jum_param1);
-        isinamaparam1[URUT] := pisahdelimeter(qlistEditor.fieldbyname('COMBO_FIELDS').ASSTRING, '|', jum_param1);
-        panjangnamaparam1 := pisahdelimeter(qlistEditor.fieldbyname('COMBO_WIDTHS').ASSTRING, '|', jum_param1);
 
         if jumlahparameter = 2 then
         begin
@@ -1393,6 +1403,7 @@ begin
             myNewQuery2[URUT].SQL.Add(' LIMIT 1');
             try
               myNewQuery2[URUT].Open;
+              logFile('query ' + myNewQuery2[URUT].Name + ' : ' + myNewQuery2[URUT].FinalSQL);
             except
               vOpenKedua := True;
             end;
@@ -1404,6 +1415,7 @@ begin
             myNewQuery2[URUT].Macros[0].Value := ' ' + Table_transaksi + ' a ';
             try
               myNewQuery2[URUT].Open;
+              logFile('query ' + myNewQuery2[URUT].Name + ' : ' + myNewQuery2[URUT].FinalSQL);
             except
               vOpenPertama := True;
             end;
@@ -1454,12 +1466,14 @@ begin
                 qErpDetail.Last;
                 if (qErpDetailWHERE_COLUMN.AsString <> '') and (qErpDetailWHERE_VALUE.AsString <> '') then
                 begin
-                  vFieldName := qErpDetailWHERE_COLUMN.AsString;
+                  vFieldName := isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]];
                   if (vFieldName <> '') and not vOpenKedua then
                   begin
                     if myNewQuery2[URUT].FindField(vFieldName) <> nil then
                     begin
-                      if myNewQuery2[URUT].FieldByName(vFieldName).Origin <> '' then
+                      if QListEditor.FieldByName('COMBO_ALIAS').AsString <> '' then
+                        vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]]
+                      else if myNewQuery2[URUT].FieldByName(vFieldName).Origin <> '' then
                         vFieldName := myNewQuery2[URUT].FieldByName(vFieldName).Origin
                     end
                     else
@@ -1474,6 +1488,7 @@ begin
                     myNewQuery2[URUT].MacroByName('KONDISI').Value := ' AND ' + vFieldName + ' = ' + QuotedStr(qErpDetailWHERE_VALUE.AsString);
                     try
                       myNewQuery2[URUT].Active := true;
+                      logFile('query ' + myNewQuery2[URUT].Name + ' : ' + myNewQuery2[URUT].FinalSQL);
                     except
                       logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !');
                       vError := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !';
@@ -1578,6 +1593,7 @@ begin
 
                   myNewQuery2[URUT].macrobyname('kondisi2').Value := s;
                   myNewQuery2[URUT].open;
+                  logFile('query ' + myNewQuery2[URUT].Name + ' : ' + myNewQuery2[URUT].FinalSQL);
                 except
                   on E: exception do
                   begin
@@ -1659,10 +1675,16 @@ begin
   ada_sql1 := AnsiContainsStr(S, LABEL_SOURCE[no_urut]);
   if ada_sql1 then
   begin
-    QERP_SQL.Active := FALSE;
-    QERP_SQL.ParamByName('NO_URUT').AsString := INTTOSTR(MASTER_SOURCE[no_urut]);
-    QERP_SQL.Active := TRUE;
-    S := AnsiReplaceStr(S, LABEL_SOURCE[no_urut], QERP_SQL.fieldbyname('str_sql').asstring);
+    try
+      logFile('Proses QERP_SQL');
+      QERP_SQL.Active := FALSE;
+      QERP_SQL.ParamByName('NO_URUT').AsString := INTTOSTR(MASTER_SOURCE[no_urut]);
+      QERP_SQL.Active := TRUE;
+      S := AnsiReplaceStr(S, LABEL_SOURCE[no_urut], QERP_SQL.fieldbyname('str_sql').asstring);
+    except
+      on E: Exception do
+        logFile('QERP_SQL error ' + E.Message)
+    end;
     QERP_SQL.Active := FALSE;
   end;
 
@@ -2558,9 +2580,10 @@ var
   pilih_allitem, allitem, tipeparam, jumlahparameter, jum_sql, j, urut: integer;
   vUrut: Integer;
   dtTgl1, dtTgl2: TDateTime;
+  vValue1, vValue2: string;
 begin
   qErpDetail.Filtered := False;
-//  logFile('Proses jumlah filter ' + IntToStr(qErpDetail.RecordCount));
+  logFile('Proses jumlah filter ' + IntToStr(qErpDetail.RecordCount));
   for i := 1 to 12 do
     str[i] := '';
   for j := 0 to 20 do
@@ -2611,7 +2634,9 @@ begin
           jumlahparameter := Query1.FieldByName('DISPLAY_DOUBLE_FLAG').AsInteger;
           str_alias_baru := Query1.FieldByName('NAMA_ALIAS').AsString;
           allitem := Query1.FieldByName('DISPLAY_ALL_FLAG').AsInteger;
+          logFile('check kolom sql_uses ' + Query1.FieldByName('SQL_USES').AsString);
           sql_param := pisahdelimeter(Query1.FieldByName('SQL_USES').AsString, '|', jum_sql);
+          logFile(string.join(',', sql_param));
           kondisi_perlu := true;
         end
         else
@@ -2753,9 +2778,20 @@ begin
                   logFile('2')
                 end
                 else
-
                   logFile('2.1.1');
+                try
+                  vValue1 := myNewQuery[urut].FieldByName(nama_id[urut]).asstring;
+                except
+                  vValue1 := '';
+                end;
+                try
+                  vValue2 := myNewQuery2[urut].FieldByName(nama_id[urut]).asstring;
+                except
+                  vValue2 := '';
+                end;
+                vValue1 := myNewQuery[urut].FieldByName(nama_id2[urut]).AsString;
                 logFile(nama_id2[urut]);
+                logFile('DEBUG urut=' + IntToStr(urut) + ' jumlahparameter=' + IntToStr(jumlahparameter) + ' myNewQuery_nil=' + BoolToStr(myNewQuery[urut] = nil, true) + ' myNewQuery2_nil=' + BoolToStr(myNewQuery2[urut] = nil, true) + ' nama_id=' + nama_id[urut] + ' nama_id2=' + nama_id2[urut] + 'punyaanak[urut]=' + IntToStr(punyaanak[urut]));
                 if (not all_item_fatra) then
                 //ini untuk mengisi field dibawah group item yang tidak terdapat 'Kolom ALL'
                   if (jumlahparameter = 1) and (punyaanak[urut] <> 0) then
@@ -2796,10 +2832,10 @@ begin
                     end;
                     //v_a_param_yg_dipasing[1,urut] :=isi_nama_id[urut];
                   end
-                  else if (((jumlahparameter = 2) and (myNewQuery2[urut].FieldByName(nama_id[urut]).asstring = myNewQuery[urut].FieldByName(nama_id[urut]).asstring)) or ((jumlahparameter = 1) and (punyaanak[urut] = 0))) then
+                  else if (((jumlahparameter = 2) and (vValue1 = vValue2)) or ((jumlahparameter = 1) and (punyaanak[urut] = 0))) then
                   begin
 
-                    logFile('2.4');
+                    logFile('2.4 ' + nama_id[urut] + 'myNewQuery2 = ' + vValue2 + ' myNewQuery = ' + vValue1);
                     if UPPERCASE(nama_id[urut]) = 'PERIOD_NAME' then
                     begin
                       if isi_nama_id2[urut] <> '' then
@@ -2895,6 +2931,7 @@ begin
                       begin
                       //if CHOICE_VAR[urut] = 2 then
                         begin
+                          logFile('2.10.1');
                           str[urut] := ' and ' + LABEL_MK_1_1[urut] + str_tambah + nama_LABEL_ID2[urut] + ' between ' + db + isi_nama_id[urut] + db + ' and ' + db + isi_nama_id2[urut] + db + ') ';
                        //Str[urut]   := ' and '+LABEL_MK_1_1[URUT] +str_tambah+ nama_LABEL_ID2[URUT] + ' between ' +
                        //dbl + dblookuph[urut].Value + dbl+' and '+ dbl+ dblookupd[urut].Value +  dbl +') ';
@@ -2907,6 +2944,7 @@ begin
                       end
                       else
                       begin
+                        logFile('2.10.2');
                         str[urut] := ' and ' + LABEL_MK_1_1[urut] + str_tambah + nama_Label_id2[urut] + LABEL_MK_1_3[urut] + myNewQuery[urut].FieldByName(Label_LOOKUP[urut]).asstring + LABEL_MK_1_5[urut] + ' BETWEEN ' + db + isi_nama_id[urut] + db + ' and ' + db + isi_nama_id2[urut] + db + ') ';
                       end;
                     end;
@@ -3007,14 +3045,25 @@ begin
                   yearmonth2 := filter_YEARMONTH2(dtTgl2);
                   PERIOD2 := filter_period2(dtTgl2);
                 end;
+                try
+                  logFile('Isikan parameter 1 ' + IntToStr(vUrut) + '=' + formatdatetime('yyyy-mm-dd hh:nn:ss', dtTgl1));
+                  v_a_param_yg_dipasing[1, vUrut] := formatdatetime('yyyy-mm-dd hh:nn:ss', dtTgl1); //datetostr(dblookuptanggal[urut].date);
+                  if copy(v_a_param_yg_dipasing[1, i], 12, 5) = '00:00' then
+                  begin
+                    logFile('Isikan parameter 1 ' + IntToStr(vUrut) + '=' + formatdatetime('yyyy-mm-dd hh:nn:ss', dtTgl1));
+                    v_a_param_yg_dipasing[1, vUrut] := formatdatetime('yyyy-mm-dd', dtTgl1); //datetostr(dblookuptanggal[urut].date);
+                  end;
 
-                v_a_param_yg_dipasing[1, vUrut] := formatdatetime('yyyy-mm-dd hh:nn:ss', dtTgl1); //datetostr(dblookuptanggal[urut].date);
-                if copy(v_a_param_yg_dipasing[1, i], 12, 5) = '00:00' then
-                  v_a_param_yg_dipasing[1, vUrut] := formatdatetime('yyyy-mm-dd', dtTgl1); //datetostr(dblookuptanggal[urut].date);
+                  if (jumlahparameter = 2) then
+                  begin
+                    logFile('Isikan parameter 2 ' + IntToStr(vUrut) + '=' + formatdatetime('yyyy-mm-dd hh:nn:ss', dtTgl2));
+                    v_a_param_yg_dipasing[2, vUrut] := formatdatetime('yyyy-mm-dd hh:mm:ss', dtTgl2);
+                  end;
+                except
+                  on E: Exception do
+                    logFile('gagal isikan parameter');
 
-
-                if (jumlahparameter = 2) then
-                  v_a_param_yg_dipasing[2, vUrut] := formatdatetime('yyyy-mm-dd hh:mm:ss', dtTgl2);
+                end;
 
               end
             end;
@@ -3030,8 +3079,20 @@ begin
         if kondisi_perlu then
         begin
           for j := 0 to jum_sql - 1 do
-            skondisiall[strtoint(sql_param[j])] := skondisiall[strtoint(sql_param[j])] + str[urut];
-        end;
+          begin
+            try
+              skondisiall[strtoint(sql_param[j])] := skondisiall[strtoint(sql_param[j])] + str[urut];
+              logFile('isikan skondisiall ' + sql_param[j] + ' = ' + skondisiall[strtoint(sql_param[j])]);
+
+            except
+              on E: Exception do
+                logFile('tidak bisa isikan  skondisiall')
+
+            end;
+          end;
+        end
+        else
+          logFile('tidak ada isikan kondisi ' + QListEditor.FieldByName('ERP_RPT_DETAIL_ID').AsString);
 
       end; // end visible label
 
@@ -5151,7 +5212,7 @@ begin
         end;
         PARENT_SQL_HEADER(NOURUT);
         qHeader.Macrobyname('Kondisi').Value := skondisiall[NOURUT];
-
+        logFile('kondisi qheader = ' + skondisiall[NOURUT] + ' dari skondisiall ' + string.join(',', skondisiall));
         i := 0;
         while i < JUM_PARAM_YG_DIAMBIL[NOURUT] do
         begin
@@ -8456,6 +8517,12 @@ begin
     qSql.Active := False;
     qSql.ParamByName('ERP_RPT_ID').AsString := vReportId;
     qSql.Active := True;
+    logFile('qSql QUERY : ' + qSql.FinalSQL);
+    if qSql.RecordCount = 0 then
+    begin
+      logFile('Maaf data qsql kosong!');
+      exit;
+    end;
   except
     on E: exception do
     begin
@@ -8755,7 +8822,7 @@ begin
             if not Obj.TryGetValue<string>('ERP_RPT_DETAIL_ID', vERP_RPT_DETAIL_ID) then
               Continue;
 
-            if Obj.TryGetValue<TJSONArray>('WHERE', WHERE) then
+            if Obj.TryGetValue<TJSONArray>('PARAM', WHERE) then
             begin
               for J := 0 to WHERE.Count - 1 do
               begin
@@ -8766,8 +8833,8 @@ begin
 
                 qErpDetail.Append;
                 qErpDetailERP_DETAIL_ID.AsString := vERP_RPT_DETAIL_ID;
-                qErpDetailWHERE_COLUMN.AsString := WhereObj.GetValue<string>('COLUMN', '');
-                qErpDetailWHERE_VALUE.AsString := WhereObj.GetValue<string>('VALUE', '');
+                qErpDetailWHERE_COLUMN.AsString := WhereObj.GetValue<string>('SAME_COLUMN', '');
+                qErpDetailWHERE_VALUE.AsString := WhereObj.GetValue<string>('DIFF_VALUE', '');
                 qErpDetail.Post;
 
                 logFile('isi data  qErpDetail erp_detail_id ' + vERP_RPT_DETAIL_ID + ' kolom ' + qErpDetailWHERE_COLUMN.AsString + ' value ' + qErpDetailWHERE_VALUE.AsString);
