@@ -346,8 +346,22 @@ object svReport: TsvReport
   end
   object qERP_SQL: TwwMyQuery
     Connection = db1
+<<<<<<< HEAD
     Left = 608
     Top = 48
+=======
+    SQL.Strings = (
+      'select STR_SQL from erp_SQL'
+      'WHERE TRANS_NO = :NO_URUT')
+    Left = 730
+    Top = 58
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'NO_URUT'
+        Value = nil
+      end>
+>>>>>>> de8779bd424719db3fe7a8205f853761e798201b
   end
   object q1: TwwMyQuery
     Connection = db1
