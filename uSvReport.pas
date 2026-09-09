@@ -264,7 +264,7 @@ type
     procedure PARENT_SQL_19(NOURUT: INTEGER);
     procedure PARENT_SQL_20(NOURUT: INTEGER);
   public
-    vFileNotif, Group_id, FInstanceName, vHostNames, vError, vFTP: string;
+    vFileNotif, Group_id, FInstanceName, vHostNames, vFTP: string;
     function GetServiceController: TServiceController; override;
     procedure SetInstanceName(const Value: string);
     procedure ChangeServiceConfiguration;   //nassrul 14/02/18
@@ -1072,7 +1072,7 @@ begin
     on E: exception do
     begin
       logFile('QListEditor failed open ' + E.Message + '!');
-      vError := 'QListEditor failed open ' + E.Message + '!';
+      vErr := 'QListEditor failed open ' + E.Message + '!';
       Exit;
     end;
   end;
@@ -1337,7 +1337,7 @@ begin
               begin
                 logFile('maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString);
                 logFile(myNewQuery[URUT].FinalSQL);
-                vError := 'maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString;
+                vErr := 'maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString;
                 Exit;
               end;
             end;
@@ -1350,14 +1350,14 @@ begin
                   myNewQuery[URUT].Active := true;
                 except
                   logFile('maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !');
-                  vError := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
+                  vErr := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
                   Exit;
                 end;
               end
               else
               begin
                 logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!');
-                vError := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!';
+                vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!';
                 Exit;
               end;
             end;
@@ -1465,7 +1465,7 @@ begin
                     else
                     begin
                       logFile('maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString);
-                      vError := 'maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString;
+                      vErr := 'maaf kolom ' + vFieldName + ' tidak ada di erp_rpt_detail_id=' + qErpDetailERP_DETAIL_ID.AsString;
                       Exit;
                     end;
                   end;
@@ -1476,7 +1476,7 @@ begin
                       myNewQuery2[URUT].Active := true;
                     except
                       logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !');
-                      vError := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !';
+                      vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !';
                       Exit;
                     end;
                   end;
@@ -1485,14 +1485,14 @@ begin
               else
               begin
                 logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' json tidak ada!');
-                vError := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' json tidak ada!';
+                vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' json tidak ada!';
                 Exit;
               end;
             end
             else
             begin
               logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!');
-              vError := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!';
+              vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' macro kondisi tidak ada!';
               Exit;
             end;
           end;
@@ -1548,7 +1548,7 @@ begin
                   on E: exception do
                   begin
                     logFile('open ' + myNewQuery[URUT].Name + ' Bermasalah error ' + E.Message + '!');
-                    vError := 'open ' + myNewQuery[URUT].Name + ' Bermasalah error ' + E.Message + '!';
+                    vErr := 'open ' + myNewQuery[URUT].Name + ' Bermasalah error ' + E.Message + '!';
                     Exit;
                   end;
                 end;
@@ -1582,7 +1582,7 @@ begin
                   on E: exception do
                   begin
                     logFile('open ' + myNewQuery2[URUT].Name + ' Bermasalah error ' + E.Message + '!');
-                    vError := 'open ' + myNewQuery2[URUT].Name + ' Bermasalah error ' + E.Message + '!';
+                    vErr := 'open ' + myNewQuery2[URUT].Name + ' Bermasalah error ' + E.Message + '!';
                     Exit;
                   end;
                 end;
@@ -8355,7 +8355,10 @@ begin
         Repstart.Run(nama_template + '.xlsx', Filename);
       except
         on E: Exception do
+        begin
+          vErr := E.Message;
           logFile('Repstart.Run ' + E.Message)
+        end;
       end;
       if FileExists(Filename) then
       begin
@@ -8783,7 +8786,7 @@ begin
 
         logFile('berhasil menambahkan filter ' + IntToStr(qErpDetail.RecordCount) + ' data');
         logFileWeb('Proses Query dan filter');
-        vError := '';
+        vErr := '';
         keluar;
         if pertamakali() then
         begin
@@ -8858,10 +8861,10 @@ begin
         end
         else
         begin
-          if vError <> '' then
+          if vErr <> '' then
           begin
             qReportWeb.Edit;
-            qReportWebERROR.AsString := vError;
+            qReportWebERROR.AsString := vErr;
             qReportWebERROR_USER.AsString := ' Report bermasalah harap hubungi support!';
             qReportWeb.Post;
           end;
