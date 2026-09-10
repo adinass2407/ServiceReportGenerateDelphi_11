@@ -8414,8 +8414,10 @@ begin
       except
         on E: Exception do
         begin
+          Result := False;
           vErr := E.Message;
-          logFile('Repstart.Run ' + E.Message)
+          logFile('Repstart.Run ' + E.Message);
+          Exit;
         end;
       end;
       if FileExists(Filename) then
