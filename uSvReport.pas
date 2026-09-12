@@ -2786,7 +2786,7 @@ begin
                 except
                   vValue2 := '';
                 end;
-                vValue1 := myNewQuery[urut].FieldByName(nama_id2[urut]).AsString;
+
                 logFile(nama_id2[urut]);
                 logFile('DEBUG urut=' + IntToStr(urut) + ' jumlahparameter=' + IntToStr(jumlahparameter) + ' myNewQuery_nil=' + BoolToStr(myNewQuery[urut] = nil, true) + ' myNewQuery2_nil=' + BoolToStr(myNewQuery2[urut] = nil, true) + ' nama_id=' + nama_id[urut] + ' nama_id2=' + nama_id2[urut] + 'punyaanak[urut]=' + IntToStr(punyaanak[urut]));
                 if (not all_item_fatra) then
