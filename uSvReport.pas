@@ -1334,13 +1334,13 @@ begin
           logFile('WHERE_VALUE ' + qErpDetailWHERE_VALUE.AsString + ' WHERE_COLUMN ' + qErpDetailWHERE_COLUMN.AsString);
           if (qErpDetailWHERE_VALUE.AsString <> '') and (qErpDetailWHERE_COLUMN.AsString <> '') then
           begin
-            vFieldName := isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]];
+            vFieldName := isinamaparam1[URUT][0];
             if (vFieldName <> '') and not vOpenPertama then
             begin
               if myNewQuery[URUT].FindField(vFieldName) <> nil then
               begin
-                if isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]] <> '' then
-                  vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]]
+                if isinamaparam1[URUT][0] <> '' then
+                  vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][0]
                 else if myNewQuery[URUT].FieldByName(vFieldName).Origin <> '' then
                   vFieldName := myNewQuery[URUT].FieldByName(vFieldName).Origin
               end
@@ -1361,9 +1361,14 @@ begin
                   myNewQuery[URUT].Active := true;
                   logFile('query ' + myNewQuery[URUT].Name + ' : ' + myNewQuery[URUT].FinalSQL);
                 except
-                  logFile('maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !');
-                  vErr := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
-                  Exit;
+                  try
+                    myNewQuery[URUT].MacroByName('KONDISI').Value := ' AND ' + qErpDetailWHERE_COLUMN.AsString + ' = ' + QuotedStr(qErpDetailWHERE_VALUE.AsString);
+                    myNewQuery[URUT].Active := true;
+                  except
+                    logFile('maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !');
+                    vErr := 'maaf, untuk parameter PERTAMA DI ' + qlistEditor.fieldbyname('DISPLAY_FORM').AsString + ' maka TABEL TRANSAKSI harus diisi !';
+                    Exit;
+                  end;
                 end;
               end
               else
@@ -1463,13 +1468,13 @@ begin
                 qErpDetail.Last;
                 if (qErpDetailWHERE_COLUMN.AsString <> '') and (qErpDetailWHERE_VALUE.AsString <> '') then
                 begin
-                  vFieldName := isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]];
+                  vFieldName := isinamaparam1[URUT][0];
                   if (vFieldName <> '') and not vOpenKedua then
                   begin
                     if myNewQuery2[URUT].FindField(vFieldName) <> nil then
                     begin
                       if QListEditor.FieldByName('COMBO_ALIAS').AsString <> '' then
-                        vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][COMBO_LOOKUP_FIELD[URUT]]
+                        vFieldName := QListEditor.FieldByName('COMBO_ALIAS').AsString + '.' + isinamaparam1[URUT][0]
                       else if myNewQuery2[URUT].FieldByName(vFieldName).Origin <> '' then
                         vFieldName := myNewQuery2[URUT].FieldByName(vFieldName).Origin
                     end
@@ -1487,9 +1492,15 @@ begin
                       myNewQuery2[URUT].Active := true;
                       logFile('query ' + myNewQuery2[URUT].Name + ' : ' + myNewQuery2[URUT].FinalSQL);
                     except
-                      logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !');
-                      vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !';
-                      Exit;
+                      try
+                        myNewQuery2[URUT].MacroByName('KONDISI').Value := ' AND ' + qErpDetailWHERE_COLUMN.AsString + ' = ' + QuotedStr(qErpDetailWHERE_VALUE.AsString);
+                        myNewQuery2[URUT].Active := true;
+
+                      except
+                        logFile('maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !');
+                        vErr := 'maaf, untuk parameter KEDUA DI ' + qlistEditor.FIELDBYNAME('DISPLAY_FORM').ASSTRING + ' maka TABEL TRANSAKSI harus diisi !';
+                        Exit;
+                      end;
                     end;
                   end;
                 end;
@@ -2707,32 +2718,29 @@ begin
                   logFile(myNewQuery[urut].Name + ' false');
                 if myNewQuery[urut].findfield(nama_id[urut]) <> nil then
                 begin
-                  logFile('0.1.1');
              // 12 agustus 2021
                   if nama_id[urut] <> '' then
                     if (isi_nama_id[urut] = '') and (myNewQuery[urut].FIELDBYNAME(nama_id[urut]).Asstring <> '') then
                       isi_nama_id[urut] := myNewQuery[urut].FIELDBYNAME(nama_id[urut]).Asstring;
-                  logFile('0.1.2');
+                  logFile('isi_nama_id[urut] = ' + nama_id[urut] + ' :' + myNewQuery[urut].FIELDBYNAME(nama_id[urut]).Asstring + ' query :' + myNewQuery[urut].FinalSQL);
                //else
                  //isi_nama_id[urut] := isi_id[urut];
 
               // akhir 12 agustus 2021
 
                   v_a_param_yg_dipasing[1, vUrut] := isi_nama_id[urut];
-                  logFile('0.1.3');
 
                   oldNILAI_satu_id[posisi] := isi_nama_id[urut];
-                  logFile('0.1.4');
                 end;
                 if isi_kata[urut] <> '' then
                   oldNILAI_satu[posisi] := isi_kata[urut]
                 else if nama_id[urut] <> '' then
                   oldNILAI_satu[posisi] := myNewQuery[urut].FIELDBYNAME(nama_id[urut]).AsString;
 
-                logFile('0.1');
                 if UPPERCASE(nama_id[urut]) = 'PERIOD_NAME' then
                 begin
                   PERIOD1 := isi_nama_id[urut];
+                  logFile('PERIOD1 ' + PERIOD1);
                   if Period1 <> '' then
                   begin
 
