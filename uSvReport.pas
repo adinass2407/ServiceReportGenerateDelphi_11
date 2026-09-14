@@ -929,7 +929,7 @@ begin
     vSql := 'UPDATE API_REPORT ';
     vSql := vSql + 'SET GENERATE_FLAG = 2 , WORKER = ' + QuotedStr(FInstanceName);
     vSql := vSql + ' WHERE API_REPORT_ID = ' + vApiReportId;
-    vSql := vSql + '  AND (GENERATE_FLAG IS NULL OR GENERATE_FLAG <> 2)';
+    vSql := vSql + '  AND (GENERATE_FLAG IS NULL OR GENERATE_FLAG NOT IN (2,3))';
     qClaim.SQL.Text := vSql;
     try
       qClaim.ExecSQL;
@@ -1066,6 +1066,7 @@ begin
   vOpenPertama := False;
   vOpenKedua := False;
   Result := False;
+  Run_sql('UPDATE API_REPORT SET WORK_DATE = SYSDATE() WHERE API_REPORT_ID = ' + qReportWebAPI_REPORT_ID.AsString);
 //  logFile('Proses pertamakali');
   vlimit_global := '25';
   try
@@ -2795,7 +2796,7 @@ begin
                   vValue2 := '';
                 end;
 
-                logFile(nama_id2[urut]);
+                logFile('vValue1:' + vValue1 + ' vValue2:' + vValue2);
                 logFile('DEBUG urut=' + IntToStr(urut) + ' jumlahparameter=' + IntToStr(jumlahparameter) + ' myNewQuery_nil=' + BoolToStr(myNewQuery[urut] = nil, true) + ' myNewQuery2_nil=' + BoolToStr(myNewQuery2[urut] = nil, true) + ' nama_id=' + nama_id[urut] + ' nama_id2=' + nama_id2[urut] + 'punyaanak[urut]=' + IntToStr(punyaanak[urut]));
                 if (not all_item_fatra) then
                 //ini untuk mengisi field dibawah group item yang tidak terdapat 'Kolom ALL'
@@ -8928,6 +8929,7 @@ begin
           begin
             qReportWeb.Edit;
             qReportWebERROR.AsString := vErr;
+            qReportWebGENERATE_FLAG.AsString := '3';
             qReportWebERROR_USER.AsString := ' Report bermasalah harap hubungi support!';
             SendNotification(qReportWebAPI_REPORT_ID.AsString);
             qReportWeb.Post;
@@ -8939,6 +8941,7 @@ begin
           begin
             qReportWeb.Edit;
             qReportWebERROR.AsString := vErr;
+            qReportWebGENERATE_FLAG.AsString := '3';
             qReportWebERROR_USER.AsString := ' Report bermasalah harap hubungi support!';
             qReportWeb.Post;
           end;
@@ -8949,6 +8952,7 @@ begin
         begin
           qReportWeb.Edit;
           qReportWebERROR.AsString := E.Message;
+          qReportWebGENERATE_FLAG.AsString := '3';
           qReportWebERROR_USER.AsString := ' Report bermasalah harap hubungi support!';
           qReportWeb.Post;
           logFile('report bermasalah error erp_rpt_id ' + qReportWebERP_RPT_ID.AsString + ' ' + E.Message);
@@ -8961,6 +8965,7 @@ begin
     begin
       qReportWeb.Edit;
       qReportWebERROR.AsString := E.Message;
+      qReportWebGENERATE_FLAG.AsString := '3';
       qReportWebERROR_USER.AsString := ' Report bermasalah harap hubungi support!';
       qReportWeb.Post;
       logFile(qReportWebDATABASE_NAME.AsString + ' on ' + qReportWebHOSTNAME.AsString + ':' + qReportWebPORT.AsString + ' error ' + E.Message);
