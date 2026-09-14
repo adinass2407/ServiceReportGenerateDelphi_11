@@ -787,6 +787,7 @@ begin
   baris 6 flag pakai FTP (Y/N)
   }
   logFile('======Setting awal======');
+  logFile('build date on 14/09/2026');
   vFileNotif := patch + 'appApiNotifReport.exe';
   i := 1;
   vSoftOpened := False;
