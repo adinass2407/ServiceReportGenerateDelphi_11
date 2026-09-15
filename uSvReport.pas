@@ -869,15 +869,15 @@ begin
     dbase[4] := '3306';
   end;
 
-  if IsDirAccessible(vOutPutFile) then
-  begin
-    logFile('Output PDF menggunakan vOutPutFile: ' + vOutPutFile);
-  end
-  else
-  begin
-    vOutPutFile := patch + 'REPORT\PDF\';
-    logFile('vOutPutFile (' + vOutPutFile + ') tidak bisa diakses, pakai folder default: ' + vOutPutFile);
-  end;
+//  if IsDirAccessible(vOutPutFile) then
+//  begin
+  logFile('Output PDF menggunakan vOutPutFile: ' + vOutPutFile);
+//  end
+//  else
+//  begin
+//    vOutPutFile := patch + 'REPORT\PDF\';
+//    logFile('vOutPutFile (' + vOutPutFile + ') tidak bisa diakses, pakai folder default: ' + vOutPutFile);
+//  end;
   logFile('connecting server:' + dbase[0] + ' -- port:' + dbase[4]);
   logFile('Baris 1 untuk nama server');
   logFile('Baris 2 untuk nama database manage');
@@ -8864,7 +8864,13 @@ begin
         logFileWeb('Proses Query dan filter');
         vErr := '';
         keluar;
-        if pertamakali() then
+
+        if not IsDirAccessible(vOutPutFile) then
+        begin
+          logFile('vOutPutFile (' + vOutPutFile + ') tidak bisa diakses');
+          vErr := vOutPutFile + ' tidak bisa di akses';
+        end;
+        if pertamakali() and (vErr = '') then
         begin
           logFile('proses data');
           vErr := '';
